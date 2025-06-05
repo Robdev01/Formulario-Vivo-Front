@@ -1,0 +1,109 @@
+Vou explicar detalhadamente como está funcionando o frontend e onde está cada campo:
+
+📁 Estrutura do Projeto
+1. Páginas Principais (src/pages/)
+🏠 Index.tsx (Página Inicial - /)
+Localização: src/pages/Index.tsx
+Função: Página de cadastro principal
+Campos do formulário (dentro do componente DataForm):
+Cliente
+SIP
+DDR
+LP
+Atp/Osx
+Cabo
+Fibras
+Enlace (metros)
+Porta
+Botão: "Acessar Sistema de Pesquisa" (leva para /login)
+🔐 Login.tsx (Tela de Login - /login)
+Localização: src/pages/Login.tsx
+Campos:
+Usuário (campo de texto)
+Senha (campo de senha)
+Botões:
+"Entrar" (leva para /search)
+"Voltar para o cadastro" (volta para /)
+🔍 Search.tsx (Tela de Pesquisa - /search)
+Localização: src/pages/Search.tsx
+Campos de pesquisa:
+SIP
+DDR
+LP
+Botões:
+"Pesquisar" (executa a busca)
+"Admin" (leva para /admin)
+"Sair" (volta para /login)
+Resultados: Mostra cards com todas as informações encontradas
+⚙️ Admin.tsx (Painel Administrativo - /admin)
+Localização: src/pages/Admin.tsx
+Funcionalidades:
+Configurar APIs: Modal com campos para URL base, chave da API e endpoints
+Gerenciar dados: CRUD completo (Criar, Ler, Atualizar, Deletar)
+Campos do formulário de dados:
+Cliente, SIP, DDR, LP, Atp/Osx, Cabo, Fibras, Enlace, Porta
+Botões:
+"Configurar APIs"
+"Novo Item"
+"Editar" (em cada card)
+"Excluir" (em cada card)
+"Voltar" (para /search)
+2. Componentes (src/components/)
+📝 DataForm.tsx
+Localização: src/components/DataForm.tsx
+Usado em: Página Index
+Todos os campos de cadastro:
+- cliente: string
+- sip: string
+- ddr: string
+- lp: string
+- atpOsx: string
+- cabo: string
+- fibras: string
+- enlace: string
+- porta: string
+3. Roteamento (src/App.tsx)
+Rotas configuradas:
+/ → Index (Cadastro)
+/login → Login
+/search → Pesquisa
+/admin → Administração
+* → NotFound (404)
+🔄 Fluxo de Navegação
+Página Inicial (/) 
+    ↓ "Acessar Sistema de Pesquisa"
+Login (/login)
+    ↓ "Entrar"
+Pesquisa (/search)
+    ↓ "Admin"
+Admin (/admin)
+    ↓ "Voltar"
+Pesquisa (/search)
+💾 Gerenciamento de Dados
+Estados Locais (useState)
+Index: Dados do formulário de cadastro
+Login: Username e password
+Search: Campos de pesquisa + resultados + loading
+Admin: Lista de dados + formulário de edição + config de API
+Armazenamento Local (localStorage)
+Admin: Configurações da API são salvas no localStorage com a chave 'apiConfig'
+Dados Simulados
+Todas as páginas usam dados mockados (simulados) para demonstração:
+
+Search: Array mockData com 2 registros exemplo
+Admin: Array data no estado com os mesmos dados
+🎨 Estilização
+Tailwind CSS: Framework de CSS utilitário
+Shadcn/UI: Componentes pré-construídos (Button, Input, Label, Card, Dialog)
+Lucide React: Ícones (Search, Edit, Trash, Plus, etc.)
+🔧 Configuração de API (Admin)
+Campos disponíveis no modal "Configurar APIs":
+
+URL Base: Endereço principal da API
+Chave da API: Token de autenticação
+Endpoints:
+Pesquisa: /api/search
+Criar: /api/create
+Atualizar: /api/update
+Deletar: /api/delete
+Essa é a estrutura completa do seu frontend! Cada campo está bem organizado e o sistema está preparado para conectar com uma API real quando você configurar no painel de admin.
