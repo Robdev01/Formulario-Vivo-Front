@@ -1,6 +1,5 @@
-Vou explicar detalhadamente como está funcionando o frontend e onde está cada campo:
-
 📁 Estrutura do Projeto
+
 1. Páginas Principais (src/pages/)
 🏠 Index.tsx (Página Inicial - /)
 Localização: src/pages/Index.tsx
@@ -48,6 +47,7 @@ Botões:
 "Editar" (em cada card)
 "Excluir" (em cada card)
 "Voltar" (para /search)
+
 2. Componentes (src/components/)
 📝 DataForm.tsx
 Localização: src/components/DataForm.tsx
@@ -62,6 +62,7 @@ Todos os campos de cadastro:
 - fibras: string
 - enlace: string
 - porta: string
+
 3. Roteamento (src/App.tsx)
 Rotas configuradas:
 / → Index (Cadastro)
