@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import loginIcon from '@/assets/logo_vivo.png'
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -17,20 +18,24 @@ const Login = () => {
     // Simulação de login - em um app real, você validaria com backend
     if (username && password) {
       console.log('Login successful');
-      navigate('/search');
+      navigate('/searchuser');
     } else {
       alert('Por favor, preencha todos os campos');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <div className="flex items-center justify-center gap-2 mt-6">
+           
+          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">                
             Fazer Login
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <img src={loginIcon} alt="Ícone de login" className="w-8 h-8" />
+        </div>
+        <div>
+           <p className="mt-2 text-center text-sm text-gray-600">
             Acesse o sistema de pesquisa
           </p>
         </div>
@@ -69,7 +74,8 @@ const Login = () => {
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              style={{ backgroundColor: 'blueviolet' }}
+              className="w-full butoon_acessar text-white"
             >
               Entrar
             </Button>

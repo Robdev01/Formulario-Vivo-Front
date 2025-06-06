@@ -20,7 +20,7 @@ interface ResultData extends SearchData {
   porta: string;
 }
 
-const Search = () => {
+const SearchUser = () => {
   const [searchData, setSearchData] = useState<SearchData>({
     sip: '',
     ddr: '',
@@ -85,7 +85,7 @@ const Search = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -97,14 +97,7 @@ const Search = () => {
             </p>
           </div>
           
-          <div className="flex gap-2">
-            <Link to="/admin">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Settings size={16} />
-                Admin
-              </Button>
-            </Link>
-            
+          <div className="flex gap-2">            
             <Link to="/login">
               <Button variant="outline" className="flex items-center gap-2">
                 <LogOut size={16} />
@@ -219,4 +212,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default SearchUser;
