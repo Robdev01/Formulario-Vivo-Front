@@ -29,6 +29,9 @@ const DataForm = () => {
     porta: ''
   });
 
+  const [error, setError] = useState<string | null>(null);
+  const [ sucess, setSuccess] = useState<string | null>(null);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -37,10 +40,49 @@ const DataForm = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Dados do formulário:', formData);
+    setError(null);
+    setSuccess(null);
+
+
+    try{
+      // Envia os dados para api
+      const response = await fetch('http://api/enviar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+          // Caso precise de autenticação, adicione aqui, ex:
+          // 'Authorization': `Bearer ${seuToken}`          
+        },
+        body: JSON.stringify(formData) // Converte os dados do formulário em JSON
+      });
+      if (!response.ok) {
+        throw new Error('Erro ao enviar os dados para a API');
+      }
+
+      const result = await response.json();
+      setSuccess('Dados enviados com sucesso!');
+      console.log('Resposta da API:', result);
+
+      // Opcional: Limpa o formulário após o envio
+      setFormData({
+        cliente: '',
+        sip: '',
+        ddr: '',
+        lp: '',
+        atpOsx: '',
+        cabo: '',
+        fibras: '',
+        enlace: '',
+        porta: ''
+      });
+    } catch (err) {
+      setError(err.message || 'Ocorreu um erro ao enviar os dados');
+      console.error('Erro:', err);
+    }
   };
+
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
