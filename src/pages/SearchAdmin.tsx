@@ -98,14 +98,21 @@ const SearchAdmin = () => {
           </div>
           
           <div className="flex gap-2">
-            <Link to="/admin">
+          <Link to="/index">
               <Button variant="outline" className="flex items-center gap-2">
                 <Settings size={16} />
-                Admin
+                Registro de equipamentos
+              </Button>
+            </Link>
+
+            <Link to="/registeruser">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Settings size={16} />
+                Cadastro de usuário
               </Button>
             </Link>
             
-            <Link to="/login">
+            <Link to="/">
               <Button variant="outline" className="flex items-center gap-2">
                 <LogOut size={16} />
                 Sair

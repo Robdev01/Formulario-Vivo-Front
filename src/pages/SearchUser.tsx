@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search as SearchIcon, LogOut, Settings } from 'lucide-react';
+import { Search as SearchIcon, LogOut } from 'lucide-react';
 
 interface SearchData {
   sip: string;
@@ -13,7 +13,7 @@ interface SearchData {
 
 interface ResultData extends SearchData {
   cliente: string;
-  atpOsx: string;
+  atposx: string;
   cabo: string;
   fibras: string;
   enlace: string;
@@ -29,32 +29,6 @@ const SearchUser = () => {
   const [results, setResults] = useState<ResultData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Dados simulados para demonstração
-  const mockData: ResultData[] = [
-    {
-      sip: '1001',
-      ddr: '4733001001',
-      lp: 'LP001',
-      cliente: 'Empresa ABC Ltda',
-      atpOsx: 'ATP123',
-      cabo: 'Cabo-01',
-      fibras: '12F',
-      enlace: '1500',
-      porta: 'P1'
-    },
-    {
-      sip: '1002',
-      ddr: '4733001002',
-      lp: 'LP002',
-      cliente: 'Comercial XYZ',
-      atpOsx: 'OSX456',
-      cabo: 'Cabo-02',
-      fibras: '24F',
-      enlace: '800',
-      porta: 'P2'
-    }
-  ];
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSearchData(prev => ({
@@ -63,25 +37,36 @@ const SearchUser = () => {
     }));
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
-    
-    console.log('Searching for:', searchData);
-    
-    // Simular busca no backend
-    setTimeout(() => {
-      const filteredResults = mockData.filter(item => {
-        const sipMatch = !searchData.sip || item.sip.includes(searchData.sip);
-        const ddrMatch = !searchData.ddr || item.ddr.includes(searchData.ddr);
-        const lpMatch = !searchData.lp || item.lp.includes(searchData.lp);
-        
-        return sipMatch && ddrMatch && lpMatch;
-      });
-      
-      setResults(filteredResults);
+    setResults([]);
+
+    try {
+      let url = '';
+      if (searchData.sip) {
+        url = `http://127.0.0.1:5000/buscar/sip?sip=${encodeURIComponent(searchData.sip)}`;
+      } else if (searchData.ddr) {
+        url = `http://127.0.0.1:5000/buscar/ddr?ddr=${encodeURIComponent(searchData.ddr)}`;
+      } else if (searchData.lp) {
+        url = `http://127.0.0.1:5000/buscar/lp?lp=${encodeURIComponent(searchData.lp)}`;
+      } else {
+        alert('Preencha pelo menos um campo para pesquisar.');
+        setIsSearching(false);
+        return;
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Erro ao buscar dados');
+
+      const data = await res.json();
+      setResults(data);
+    } catch (err) {
+      console.error(err);
+      alert('Erro na busca: ' + err.message);
+    } finally {
       setIsSearching(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -96,9 +81,8 @@ const SearchUser = () => {
               Pesquise por SIP, DDR ou LP
             </p>
           </div>
-          
-          <div className="flex gap-2">            
-            <Link to="/login">
+          <div className="flex gap-2">
+            <Link to="/">
               <Button variant="outline" className="flex items-center gap-2">
                 <LogOut size={16} />
                 Sair
@@ -112,53 +96,22 @@ const SearchUser = () => {
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="sip" className="text-sm font-medium text-gray-700">
-                  SIP
-                </Label>
-                <Input
-                  id="sip"
-                  name="sip"
-                  type="text"
-                  value={searchData.sip}
-                  onChange={handleInputChange}
-                  placeholder="Digite o SIP"
-                />
+                <Label htmlFor="sip" className="text-sm font-medium text-gray-700">SIP</Label>
+                <Input id="sip" name="sip" type="text" value={searchData.sip} onChange={handleInputChange} placeholder="Digite o SIP" />
               </div>
 
               <div>
-                <Label htmlFor="ddr" className="text-sm font-medium text-gray-700">
-                  DDR
-                </Label>
-                <Input
-                  id="ddr"
-                  name="ddr"
-                  type="text"
-                  value={searchData.ddr}
-                  onChange={handleInputChange}
-                  placeholder="Digite o DDR"
-                />
+                <Label htmlFor="ddr" className="text-sm font-medium text-gray-700">DDR</Label>
+                <Input id="ddr" name="ddr" type="text" value={searchData.ddr} onChange={handleInputChange} placeholder="Digite o DDR" />
               </div>
 
               <div>
-                <Label htmlFor="lp" className="text-sm font-medium text-gray-700">
-                  LP
-                </Label>
-                <Input
-                  id="lp"
-                  name="lp"
-                  type="text"
-                  value={searchData.lp}
-                  onChange={handleInputChange}
-                  placeholder="Digite o LP"
-                />
+                <Label htmlFor="lp" className="text-sm font-medium text-gray-700">LP</Label>
+                <Input id="lp" name="lp" type="text" value={searchData.lp} onChange={handleInputChange} placeholder="Digite o LP" />
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={isSearching}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
-            >
+            <Button type="submit" disabled={isSearching} className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2">
               <SearchIcon size={16} />
               {isSearching ? 'Pesquisando...' : 'Pesquisar'}
             </Button>
@@ -171,7 +124,6 @@ const SearchUser = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Resultados da Pesquisa ({results.length})
             </h2>
-            
             <div className="space-y-4">
               {results.map((result, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -179,21 +131,19 @@ const SearchUser = () => {
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">{result.cliente}</h3>
                       <div className="space-y-1 text-sm text-gray-600">
-                        <p><span className="font-medium">SIP:</span> {result.sip}</p>
-                        <p><span className="font-medium">DDR:</span> {result.ddr}</p>
-                        <p><span className="font-medium">LP:</span> {result.lp}</p>
+                        <p><strong>SIP:</strong> {result.sip}</p>
+                        <p><strong>DDR:</strong> {result.ddr}</p>
+                        <p><strong>LP:</strong> {result.lp}</p>
                       </div>
                     </div>
-                    
                     <div className="space-y-1 text-sm text-gray-600">
-                      <p><span className="font-medium">Atp/Osx:</span> {result.atpOsx}</p>
-                      <p><span className="font-medium">Cabo:</span> {result.cabo}</p>
-                      <p><span className="font-medium">Fibras:</span> {result.fibras}</p>
+                      <p><strong>Atp/Osx:</strong> {result.atposx}</p>
+                      <p><strong>Cabo:</strong> {result.cabo}</p>
+                      <p><strong>Fibras:</strong> {result.fibras}</p>
                     </div>
-                    
                     <div className="space-y-1 text-sm text-gray-600">
-                      <p><span className="font-medium">Enlace:</span> {result.enlace} metros</p>
-                      <p><span className="font-medium">Porta:</span> {result.porta}</p>
+                      <p><strong>Enlace:</strong> {result.enlace} metros</p>
+                      <p><strong>Porta:</strong> {result.porta}</p>
                     </div>
                   </div>
                 </div>

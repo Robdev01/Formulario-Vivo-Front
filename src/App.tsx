@@ -10,6 +10,7 @@ import SearchUser from "./pages/SearchUser";
 import SearchAdmin from "./pages/SearchAdmin"
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Register from "./pages/Register"
 
 const queryClient = new QueryClient();
 
@@ -20,11 +21,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/index" element={<Index />} />
+          <Route path="/" element={<Login />} />
           <Route path="/searchuser" element={<SearchUser />} />
           <Route path="/searchadmin" element={<SearchAdmin />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/registeruser" element={<Register />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

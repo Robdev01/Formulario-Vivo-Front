@@ -7,22 +7,47 @@ import { Label } from '@/components/ui/label';
 import loginIcon from '@/assets/logo_vivo.png'
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [login, setUsername] = useState('');
+  const [senha, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { username, password });
-    
-    // Simulação de login - em um app real, você validaria com backend
-    if (username && password) {
-      console.log('Login successful');
-      navigate('/searchuser');
-    } else {
+  
+    if (!login || !senha) {
       alert('Por favor, preencha todos os campos');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          login: login,
+          senha: senha
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Redireciona com base na permissão retornada pela API
+        if (data.permissao === 'admin') {
+          navigate('/searchadmin');
+        } else {
+          navigate('/searchuser');
+        }
+      } else {
+        alert(data.error || 'Erro ao realizar login');
+      }
+    } catch (error) {
+      console.error('Erro de conexão:', error);
+      alert('Erro de conexão com o servidor');
     }
   };
+  
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -49,7 +74,7 @@ const Login = () => {
               <Input
                 id="username"
                 type="text"
-                value={username}
+                value={login}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Digite seu usuário"
                 className="mt-1"
@@ -64,7 +89,7 @@ const Login = () => {
               <Input
                 id="password"
                 type="password"
-                value={password}
+                value={senha}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Digite sua senha"
                 className="mt-1"
@@ -81,17 +106,11 @@ const Login = () => {
             </Button>
           </form>
           
-          <div className="mt-6 text-center">
-            <Link 
-              to="/" 
-              className="text-blue-600 hover:text-blue-500 text-sm"
-            >
-              Voltar para o cadastro
-            </Link>
+          
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 

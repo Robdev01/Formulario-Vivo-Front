@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,7 @@ interface FormData {
   sip: string;
   ddr: string;
   lp: string;
-  atpOsx: string;
+  atposx: string;
   cabo: string;
   fibras: string;
   enlace: string;
@@ -22,7 +21,7 @@ const DataForm = () => {
     sip: '',
     ddr: '',
     lp: '',
-    atpOsx: '',
+    atposx: '',
     cabo: '',
     fibras: '',
     enlace: '',
@@ -30,7 +29,8 @@ const DataForm = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
-  const [ sucess, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [showJson, setShowJson] = useState(false); // Controla a exibição do JSON
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,45 +44,53 @@ const DataForm = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setShowJson(true); // Mostra o JSON antes de enviar
 
+    // Validação de campos obrigatórios
+    const requiredFields = ['cliente', 'sip', 'ddr', 'lp', 'atposx', 'cabo', 'fibras', 'enlace', 'porta'];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        setError(`O campo ${field} é obrigatório.`);
+        setShowJson(false); // Oculta o JSON se houver erro
+        return;
+      }
+    }
 
-    try{
-      // Envia os dados para api
-      const response = await fetch('http://api/enviar', {
+    // Exibe os dados a serem enviados
+    const jsonToSend = JSON.stringify(formData);
+    console.log('Tentativa de envio para URL:', 'http://127.0.0.1:5000/cadastro');
+    console.log('Enviando dados:', jsonToSend);
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/cadastro', { // URL ajustada
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-          // Caso precise de autenticação, adicione aqui, ex:
-          // 'Authorization': `Bearer ${seuToken}`          
         },
-        body: JSON.stringify(formData) // Converte os dados do formulário em JSON
+        body: jsonToSend
       });
+
       if (!response.ok) {
-        throw new Error('Erro ao enviar os dados para a API');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha na requisição');
       }
+      
 
       const result = await response.json();
       setSuccess('Dados enviados com sucesso!');
       console.log('Resposta da API:', result);
-
-      // Opcional: Limpa o formulário após o envio
-      setFormData({
-        cliente: '',
-        sip: '',
-        ddr: '',
-        lp: '',
-        atpOsx: '',
-        cabo: '',
-        fibras: '',
-        enlace: '',
-        porta: ''
-      });
+      setShowJson(false); // Oculta o JSON após sucesso
+       // ✅ Recarrega a página após 1 segundo
+       setTimeout(() => {
+        window.location.reload();
+      }, 1000)
     } catch (err) {
       setError(err.message || 'Ocorreu um erro ao enviar os dados');
-      console.error('Erro:', err);
+      console.error('Erro detalhado:', err);
+    } finally {
+      setShowJson(false); // Garante que o JSON seja oculto após a tentativa
     }
   };
-
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -91,6 +99,9 @@ const DataForm = () => {
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {success && <p className="text-green-600 text-sm">{success}</p>}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="cliente" className="text-sm font-medium text-gray-700">
@@ -153,14 +164,14 @@ const DataForm = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="atpOsx" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="atposx" className="text-sm font-medium text-gray-700">
               Atp/Osx
             </Label>
             <Input
-              id="atpOsx"
-              name="atpOsx"
+              id="atposx"
+              name="atposx"
               type="text"
-              value={formData.atpOsx}
+              value={formData.atposx}
               onChange={handleInputChange}
               placeholder="Digite o Atp/Osx"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -230,15 +241,23 @@ const DataForm = () => {
 
         <div className="pt-4">
           <Button
-            type="submit" 
-              style={{ backgroundColor: 'blueviolet' }}
-              className="w-full text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out transform hover:scale-105">
- 
-
-          
+            type="submit"
+            style={{ backgroundColor: 'blueviolet' }}
+            className="w-full text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out transform hover:scale-105"
+          >
             Enviar
           </Button>
         </div>
+
+        {/* Seção para exibir o JSON */}
+        {showJson && (
+          <div className="mt-4 p-4 bg-gray-100 rounded-md">
+            <h3 className="text-lg font-semibold text-gray-700">Dados a serem enviados:</h3>
+            <pre className="text-sm text-gray-800 overflow-auto max-h-40">
+              {JSON.stringify(formData, null, 2)}
+            </pre>
+          </div>
+        )}
       </form>
     </div>
   );
