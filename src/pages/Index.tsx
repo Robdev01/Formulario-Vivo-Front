@@ -16,7 +16,7 @@ const Index = () => {
           
           <div className="mt-6">
             <Link 
-              to="/login" 
+              to="/searchadmin" 
               className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors butoon_acessar"
             >
               Acessar Sistema de Pesquisa

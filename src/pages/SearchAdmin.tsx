@@ -63,27 +63,37 @@ const SearchAdmin = () => {
     }));
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSearching(true);
-    
-    console.log('Searching for:', searchData);
-    
-    // Simular busca no backend
-    setTimeout(() => {
-      const filteredResults = mockData.filter(item => {
-        const sipMatch = !searchData.sip || item.sip.includes(searchData.sip);
-        const ddrMatch = !searchData.ddr || item.ddr.includes(searchData.ddr);
-        const lpMatch = !searchData.lp || item.lp.includes(searchData.lp);
-        
-        return sipMatch && ddrMatch && lpMatch;
-      });
-      
-      setResults(filteredResults);
-      setIsSearching(false);
-    }, 1000);
-  };
-
+  const handleSearch = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsSearching(true);
+      setResults([]);
+  
+      try {
+        let url = '';
+        if (searchData.sip) {
+          url = `http://172.16.15.44:5000/buscar/sip?sip=${encodeURIComponent(searchData.sip)}`;
+        } else if (searchData.ddr) {
+          url = `http://172.16.15.44:5000/buscar/ddr?ddr=${encodeURIComponent(searchData.ddr)}`;
+        } else if (searchData.lp) {
+          url = `http://172.16.15.44:5000/buscar/lp?lp=${encodeURIComponent(searchData.lp)}`;
+        } else {
+          alert('Preencha pelo menos um campo para pesquisar.');
+          setIsSearching(false);
+          return;
+        }
+  
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Erro ao buscar dados');
+  
+        const data = await res.json();
+        setResults(data);
+      } catch (err) {
+        console.error(err);
+        alert('Erro na busca: ' + err.message);
+      } finally {
+        setIsSearching(false);
+      }
+    };
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">

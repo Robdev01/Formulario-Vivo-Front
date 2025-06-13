@@ -20,7 +20,7 @@ const Login = () => {
     }
   
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch('http://172.16.15.44:5000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -32,6 +32,11 @@ const Login = () => {
       const data = await response.json();
   
       if (response.ok) {
+        localStorage.setItem('usuarioLogado', JSON.stringify({
+          login: data.login,
+          nome: data.nome,
+          permissao: data.permissao
+        }));
         // Redireciona com base na permissão retornada pela API
         if (data.permissao === 'admin') {
           navigate('/searchadmin');
