@@ -59,15 +59,16 @@ const Register = () => {
           <p className="mt-2 text-center text-sm text-gray-600">
             Crie sua conta para acessar o sistema
           </p>
-        </div>
-        <div className="flex gap-2">
-            <Link to="/searchadmin">
-              <Button variant="outline" className="flex items-center gap-2">
+           <div className="mt-6">
+            <Link to="/searchadmin" className="inline-flex items-center px-4 py-2 text-white rounded-md transition-colors butoon_acessar">
+              
                 <ArrowBigLeft size={16} />
                 Volta 
-              </Button>
+              
             </Link>
           </div>
+        </div>
+       
        
 
         <div className="bg-white rounded-lg shadow-lg p-8">
