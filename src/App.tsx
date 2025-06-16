@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import PrivateRoute from "./pages/PrivateRoute"; 
+import EditarCliente from './pages/EditarCliente';
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,13 @@ const App = () => (
               </PrivateRoute>
             }
           />
+          <Route path="/editar/:id" 
+          element={
+            <PrivateRoute>
+          <EditarCliente />
+          </PrivateRoute>
+        } />
+          
 
           {/* Página 404 */}
           <Route path="*" element={<NotFound />} />

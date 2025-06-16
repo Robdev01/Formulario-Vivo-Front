@@ -45,11 +45,11 @@ const SearchUser = () => {
     try {
       let url = '';
       if (searchData.sip) {
-        url = `http://172.16.15.44:5000/buscar/sip?sip=${encodeURIComponent(searchData.sip)}`;
+        url = `http://127.0.0.1:5000/buscar/sip?sip=${encodeURIComponent(searchData.sip)}`;
       } else if (searchData.ddr) {
-        url = `http://172.16.15.44:5000/buscar/ddr?ddr=${encodeURIComponent(searchData.ddr)}`;
+        url = `http://127.0.0.1:5000/buscar/ddr?ddr=${encodeURIComponent(searchData.ddr)}`;
       } else if (searchData.lp) {
-        url = `http://172.16.15.44:5000/buscar/lp?lp=${encodeURIComponent(searchData.lp)}`;
+        url = `http://127.0.0.1:5000/buscar/lp?lp=${encodeURIComponent(searchData.lp)}`;
       } else {
         alert('Preencha pelo menos um campo para pesquisar.');
         setIsSearching(false);

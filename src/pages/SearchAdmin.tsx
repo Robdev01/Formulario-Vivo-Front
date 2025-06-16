@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ interface SearchData {
 }
 
 interface ResultData extends SearchData {
+  id: number; // precisa existir no backend!
   cliente: string;
   atpOsx: string;
   cabo: string;
@@ -21,181 +22,142 @@ interface ResultData extends SearchData {
 }
 
 const SearchAdmin = () => {
-  const [searchData, setSearchData] = useState<SearchData>({
-    sip: '',
-    ddr: '',
-    lp: ''
-  });
+  const [searchData, setSearchData] = useState<SearchData>({ sip: '', ddr: '', lp: '' });
   const [results, setResults] = useState<ResultData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Dados simulados para demonstração
-  const mockData: ResultData[] = [
-    {
-      sip: '1001',
-      ddr: '4733001001',
-      lp: 'LP001',
-      cliente: 'Empresa ABC Ltda',
-      atpOsx: 'ATP123',
-      cabo: 'Cabo-01',
-      fibras: '12F',
-      enlace: '1500',
-      porta: 'P1'
-    },
-    {
-      sip: '1002',
-      ddr: '4733001002',
-      lp: 'LP002',
-      cliente: 'Comercial XYZ',
-      atpOsx: 'OSX456',
-      cabo: 'Cabo-02',
-      fibras: '24F',
-      enlace: '800',
-      porta: 'P2'
-    }
-  ];
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSearchData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setSearchData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSearch = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsSearching(true);
-      setResults([]);
-  
-      try {
-        let url = '';
-        if (searchData.sip) {
-          url = `http://172.16.15.44:5000/buscar/sip?sip=${encodeURIComponent(searchData.sip)}`;
-        } else if (searchData.ddr) {
-          url = `http://172.16.15.44:5000/buscar/ddr?ddr=${encodeURIComponent(searchData.ddr)}`;
-        } else if (searchData.lp) {
-          url = `http://172.16.15.44:5000/buscar/lp?lp=${encodeURIComponent(searchData.lp)}`;
-        } else {
-          alert('Preencha pelo menos um campo para pesquisar.');
-          setIsSearching(false);
-          return;
-        }
-  
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Erro ao buscar dados');
-  
-        const data = await res.json();
-        setResults(data);
-      } catch (err) {
-        console.error(err);
-        alert('Erro na busca: ' + err.message);
-      } finally {
+    e.preventDefault();
+    setIsSearching(true);
+    setResults([]);
+
+    try {
+      let url = '';
+      if (searchData.sip) {
+        url = `http://127.0.0.1:5000/buscar/sip?sip=${encodeURIComponent(searchData.sip)}`;
+      } else if (searchData.ddr) {
+        url = `http://127.0.0.1:5000/buscar/ddr?ddr=${encodeURIComponent(searchData.ddr)}`;
+      } else if (searchData.lp) {
+        url = `http://127.0.0.1:5000/buscar/lp?lp=${encodeURIComponent(searchData.lp)}`;
+      } else {
+        alert('Preencha pelo menos um campo para pesquisar.');
         setIsSearching(false);
+        return;
       }
-    };
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Erro ao buscar dados');
+      const data = await res.json();
+      setResults(data);
+    } catch (err: any) {
+      alert('Erro na busca: ' + err.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Tem certeza que deseja deletar este registro?')) return;
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/cadastro/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (!res.ok) throw new Error('Erro ao deletar cliente');
+
+      alert('Cliente deletado com sucesso!');
+      setResults(prev => prev.filter(r => r.id !== id));
+    } catch (err: any) {
+      alert('Erro ao deletar: ' + err.message);
+    }
+  };
+
+  const handleApiUpdate = async (item: ResultData) => {
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/atualizar/cadastro/${item.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item)
+      });
+  
+      if (!res.ok) throw new Error('Erro ao atualizar');
+  
+      const updated = await res.json();
+      alert('Cliente atualizado com sucesso!');
+  
+      // Atualiza no estado local
+      setResults(prev =>
+        prev.map(r => (r.id === updated.id ? updated : r))
+      );
+    } catch (err: any) {
+      alert('Erro ao atualizar: ' + err.message);
+    }
+  };
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">
-              Sistema de Pesquisa
-            </h1>
-            <p className="text-lg text-gray-600 mt-2">
-              Pesquise por SIP, DDR ou LP
-            </p>
+            <h1 className="text-4xl font-bold text-gray-900">Sistema de Pesquisa</h1>
+            <p className="text-lg text-gray-600 mt-2">Pesquise por SIP, DDR ou LP</p>
           </div>
-          
           <div className="flex gap-2">
-          <Link to="/index">
+            <Link to="/index">
               <Button variant="outline" className="flex items-center gap-2">
-                <Settings size={16} />
-                Registro de equipamentos
+                <Settings size={16} /> Registro de equipamentos
               </Button>
             </Link>
-
             <Link to="/registeruser">
               <Button variant="outline" className="flex items-center gap-2">
-                <Settings size={16} />
-                Cadastro de usuário
+                <Settings size={16} /> Cadastro de usuário
               </Button>
             </Link>
-            
             <Link to="/">
               <Button variant="outline" className="flex items-center gap-2">
-                <LogOut size={16} />
-                Sair
+                <LogOut size={16} /> Sair
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Formulário de Pesquisa */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="sip" className="text-sm font-medium text-gray-700">
-                  SIP
-                </Label>
-                <Input
-                  id="sip"
-                  name="sip"
-                  type="text"
-                  value={searchData.sip}
-                  onChange={handleInputChange}
-                  placeholder="Digite o SIP"
-                />
+                <Label htmlFor="sip">SIP</Label>
+                <Input id="sip" name="sip" value={searchData.sip} onChange={handleInputChange} />
               </div>
-
               <div>
-                <Label htmlFor="ddr" className="text-sm font-medium text-gray-700">
-                  DDR
-                </Label>
-                <Input
-                  id="ddr"
-                  name="ddr"
-                  type="text"
-                  value={searchData.ddr}
-                  onChange={handleInputChange}
-                  placeholder="Digite o DDR"
-                />
+                <Label htmlFor="ddr">DDR</Label>
+                <Input id="ddr" name="ddr" value={searchData.ddr} onChange={handleInputChange} />
               </div>
-
               <div>
-                <Label htmlFor="lp" className="text-sm font-medium text-gray-700">
-                  LP
-                </Label>
-                <Input
-                  id="lp"
-                  name="lp"
-                  type="text"
-                  value={searchData.lp}
-                  onChange={handleInputChange}
-                  placeholder="Digite o LP"
-                />
+                <Label htmlFor="lp">LP</Label>
+                <Input id="lp" name="lp" value={searchData.lp} onChange={handleInputChange} />
               </div>
             </div>
-
-            <Button
-              type="submit"
-              disabled={isSearching}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
-            >
+            <Button type="submit" disabled={isSearching} className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2">
               <SearchIcon size={16} />
               {isSearching ? 'Pesquisando...' : 'Pesquisar'}
             </Button>
           </form>
         </div>
 
-        {/* Resultados */}
         {results.length > 0 && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Resultados da Pesquisa ({results.length})
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Resultados da Pesquisa ({results.length})</h2>
             <div className="space-y-4">
               {results.map((result, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -203,22 +165,26 @@ const SearchAdmin = () => {
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">{result.cliente}</h3>
                       <div className="space-y-1 text-sm text-gray-600">
-                        <p><span className="font-medium">SIP:</span> {result.sip}</p>
-                        <p><span className="font-medium">DDR:</span> {result.ddr}</p>
-                        <p><span className="font-medium">LP:</span> {result.lp}</p>
+                        <p><strong>SIP:</strong> {result.sip}</p>
+                        <p><strong>DDR:</strong> {result.ddr}</p>
+                        <p><strong>LP:</strong> {result.lp}</p>
                       </div>
                     </div>
-                    
                     <div className="space-y-1 text-sm text-gray-600">
-                      <p><span className="font-medium">Atp/Osx:</span> {result.atpOsx}</p>
-                      <p><span className="font-medium">Cabo:</span> {result.cabo}</p>
-                      <p><span className="font-medium">Fibras:</span> {result.fibras}</p>
+                      <p><strong>Atp/Osx:</strong> {result.atpOsx}</p>
+                      <p><strong>Cabo:</strong> {result.cabo}</p>
+                      <p><strong>Fibras:</strong> {result.fibras}</p>
                     </div>
-                    
                     <div className="space-y-1 text-sm text-gray-600">
-                      <p><span className="font-medium">Enlace:</span> {result.enlace} metros</p>
-                      <p><span className="font-medium">Porta:</span> {result.porta}</p>
+                      <p><strong>Enlace:</strong> {result.enlace} metros</p>
+                      <p><strong>Porta:</strong> {result.porta}</p>
                     </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-4">
+                  <Button variant="outline" onClick={() => navigate(`/editar/${result.id}`, { state: result })}>Atualizar</Button>
+
+                    <Button variant="destructive" onClick={() => handleDelete(result.id)}>Deletar</Button>
                   </div>
                 </div>
               ))}

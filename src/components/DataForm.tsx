@@ -58,11 +58,11 @@ const DataForm = () => {
 
     // Exibe os dados a serem enviados
     const jsonToSend = JSON.stringify(formData);
-    console.log('Tentativa de envio para URL:', 'http://172.16.15.44:5000/cadastro');
+    console.log('Tentativa de envio para URL:', 'http://127.0.0.1:5000/cadastro');
     console.log('Enviando dados:', jsonToSend);
 
     try {
-      const response = await fetch('http://172.16.15.44:5000/cadastro', { // URL ajustada
+      const response = await fetch('http://127.0.0.1:5000/cadastro', { // URL ajustada
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
