@@ -42,7 +42,7 @@ const EditarCliente = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-bold mb-6">Editar Cliente</h1>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {['cliente', 'sip', 'ddr', 'lp', 'atpOsx', 'cabo', 'fibras', 'enlace', 'porta'].map((campo) => (

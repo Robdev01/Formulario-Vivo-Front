@@ -60,7 +60,7 @@ const Login = () => {
         <div className="flex items-center justify-center gap-2 mt-6">
            
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">                
-            Fazer Login
+            Login
           </h2>
           <img src={loginIcon} alt="Ícone de login" className="w-8 h-8" />
         </div>
